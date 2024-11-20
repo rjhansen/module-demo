@@ -59,7 +59,7 @@ As of this writing only Clang 18+ and the very latest Microsoft
 Visual Studio compilers can create or consume C++ modules.  There are a
 lot of caveats on both.
 
-### -DCMAKE_CXX_FLAGS_INIT=stdlib=libc++
+### -DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++
 As of this writing Clang requires you to use their libc++, nobody
 else’s, for modules. (libc++ is not normally installed.  On Fedora, for
 instance, I had to install packages `libcxx` and `libcxx-devel`.)
