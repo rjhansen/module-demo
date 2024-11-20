@@ -29,16 +29,19 @@ endif()
 
 set_target_properties(hello PROPERTIES PUBLIC_HEADER src/hello.h)
 target_include_directories(hello BEFORE PUBLIC src)
-target_sources(hello PRIVATE src/hello.cc)
+target_sources(hello PUBLIC src/hello.cc)
 
+target_compile_definitions(verify_module PUBLIC BOOST_ALL_NO_LIB)
+target_compile_definitions(verify_module PUBLIC BOOST_ALL_DYN_LINK)
 target_include_directories(verify_module BEFORE PUBLIC src)
-target_sources(verify_module PRIVATE src/verify_module.cc)
-target_link_libraries(verify_module PUBLIC hello)
+target_sources(verify_module PUBLIC src/verify_module.cc)
+target_sources(verify_module
+               PUBLIC 
+               FILE_SET all_modules 
+               TYPE CXX_MODULES 
+               FILES src/module.cppm)
+target_link_libraries(verify_module hello)
 
-# Note: the Boost unit test libraries are not compatible with the use
-# of C++ modules (yet).  For that reason, we use them in their header-
-# only form.  It works just as well but is slower to compile and
-# avoids ABI conflicts.
 add_test(NAME verify_module COMMAND verify_module)
 
 install(TARGETS hello PUBLIC_HEADER LIBRARY)
