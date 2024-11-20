@@ -29,8 +29,8 @@ $ git clone git@github.com:rjhansen/module-demo.git
 $ cd module-demo
 $ mkdir build
 $ cd build
-$ cmake -S .. \
-        -B . \
+$ cmake -S.. \
+        -B. \
         -DCMAKE_CXX_COMPILER=clang++ \
         -DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++ \
         -DCMAKE_BUILD_TYPE=Release \
@@ -48,14 +48,14 @@ a modern toolchain.
 
 ## Flag explanations
 
-### -S ..
+### -S..
 The `CMakeLists.txt` file is located one directory above `build`.
 
-### -B .
+### -B.
 Use the current directory (`build`) for all build artifacts.
 
 ### -DCMAKE_CXX_COMPILER=clang++
-As of this writing only Clang 18.10+ and the very latest Microsoft
+As of this writing only Clang 18+ and the very latest Microsoft
 Visual Studio compilers can create or consume C++ modules.  There are a
 lot of caveats on both.
 
