@@ -1,4 +1,4 @@
-# Copyright Notices
+# Copyright Notice
 
 Copyright © 2024, [Robert J. Hansen](mailto:rob@hansen.engineering?subject=Module-demo%20copyright).
 
