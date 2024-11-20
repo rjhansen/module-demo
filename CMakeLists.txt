@@ -1,0 +1,87 @@
+#######################################################################
+#
+# A simple build example:
+#
+# $ unzip module-demo-1.0.zip
+# $ cd module-demo-1.0
+# $ mkdir build
+# $ cd build
+# $ cmake .. \
+#         -B . \
+#         -DCMAKE_CXX_COMPILER=clang++ \
+#         -DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++ \
+#         -DCMAKE_BUILD_TYPE=Release \
+#         -G Ninja \
+#         -Wno-dev
+# $ ninja
+# $ ./hello
+# "Hello, Harry Dresden!"
+#
+#######################################################################
+#
+# (I put each flag on a different line for ease of reading, but
+# you certainly don't have to do that yourself.)
+#
+# ..: the CMakeLists.txt file is located one directory above build
+# -B .: use the current directory for all build artifacts.
+# -DCMAKE_CXX_COMPILER=clang++: as of this writing only Clang 18.10+
+#     and the very latest Microsoft Visual Studio compilers can
+#     create or consume C++ modules.
+# -DCMAKE_CXX_FLAGS_INIT=stdlib=libc++: as of this writing Clang
+#     requires you to use their libc++, nobody else's, for modules.
+#     (libc++ is not normally installed.  On Fedora, for instance,
+#     I had to install packages named "libcxx" and "libcxx-devel".)
+# -DCMAKE_BUILD_TYPE=Release: or 'Debug', as you wish.
+# -G Ninja: generate a Ninja build script.
+# -Wno-dev: this CMakeLists.txt uses features under development and
+#     gives strong warnings about relying on them.  We know this
+#     already, so let's enhance our peace of mind by suppressing these
+#     warnings.
+#
+#######################################################################
+
+
+# CMake 3.30 is required for C++20 "import std" support. 
+cmake_minimum_required(VERSION 3.30 FATAL_ERROR)
+
+# This magic must be invoked BEFORE the call to project().
+#
+# "import std" is still an experimental CMake feature and as such
+# has to be added via a magic GUID.  This may change in the future.
+# I found it in CMake source code under "Help/dev/experimental.rst",
+# so look there if this script suddenly breaks.
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD
+    "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")
+set(CMAKE_CXX_STANDARD 23 REQUIRED)
+set(CMAKE_CXX_MODULE_STD 1)
+
+project(module-demo VERSION 1.0.0 LANGUAGES CXX)
+
+# We always, always test.
+enable_testing()
+find_package(Boost 1.80 REQUIRED COMPONENTS unit_test_framework)
+
+if (UNIX OR APPLE)
+    include(GNUInstallDirs)
+    add_library(hello SHARED)
+    add_executable(verify_module)
+elseif (WIN32)
+    add_library(hello SHARED)
+    add_executable(verify_module WIN32)
+endif()
+
+set_target_properties(hello PROPERTIES PUBLIC_HEADER src/hello.h)
+target_include_directories(hello BEFORE PUBLIC src)
+target_sources(hello PRIVATE src/hello.cc)
+
+target_include_directories(verify_module BEFORE PUBLIC src)
+target_sources(verify_module PRIVATE src/verify_module.cc)
+target_link_libraries(verify_module PUBLIC hello)
+
+# Note: the Boost unit test libraries are not compatible with the use
+# of C++ modules (yet).  For that reason, we use them in their header-
+# only form.  It works just as well but is slower to compile and
+# avoids ABI conflicts.
+add_test(NAME verify_module COMMAND verify_module)
+
+install(TARGETS hello PUBLIC_HEADER LIBRARY)
