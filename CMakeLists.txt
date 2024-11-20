@@ -31,8 +31,6 @@ set_target_properties(hello PROPERTIES PUBLIC_HEADER src/hello.h)
 target_include_directories(hello BEFORE PUBLIC src)
 target_sources(hello PUBLIC src/hello.cc)
 
-target_compile_definitions(verify_module PUBLIC BOOST_ALL_NO_LIB)
-target_compile_definitions(verify_module PUBLIC BOOST_ALL_DYN_LINK)
 target_include_directories(verify_module BEFORE PUBLIC src)
 target_sources(verify_module PUBLIC src/verify_module.cc)
 target_sources(verify_module
